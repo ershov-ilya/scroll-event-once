@@ -1,0 +1,11 @@
+@charset "utf-8";
+/* CSS Document */
+
+.witch{
+  @include opacity(0);
+  @include transition(all, 0.8s);
+}
+.witch.fire{
+  @include opacity(1);
+}
+
