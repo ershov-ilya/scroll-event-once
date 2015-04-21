@@ -13,7 +13,7 @@
 
 .custom-left{
 	position:relative;
-	left:-100px;	
+	left:-200px;	
 }
 .custom-left.fire{
 	left:0;
@@ -21,7 +21,7 @@
 
 .custom-right{
 	position:relative;
-	right:-100px;	
+	right:-200px;	
 }
 .custom-right.fire{
 	right:0;
