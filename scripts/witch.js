@@ -18,9 +18,11 @@ return {init: function(){
 				$(window).on(eventName, function(){
 					var wh=$(window).height();
 					var ws=$(window).scrollTop().valueOf();
-					var delay=0;
 					$('.witch').not('.fire').each(function(){
 						var element = $(this);
+						
+						var delay=element.data('witch-offset');
+						if(!delay) delay=0;
 						var elOffset=element.offset().top;
 						var elHeight=element.height();
 						var elLine=wh+ws;
