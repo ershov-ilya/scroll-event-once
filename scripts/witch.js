@@ -4,13 +4,19 @@ var WITCH = (function(){
 		var edge=Math.round(position/100)*100;
 		$(window).trigger('witch.'+edge);
 	}
+	
+	function firstScreen(){
+		setTimeout(function(){
+			$(window).trigger('witch.0');
+		}, 1500);
+	}
 
 
 return {init: function(){
 		if(!$('.witch').size()) {return true;}
 		$(window).scroll(listener);
 	
-		for(var i=100; i<=10000; i+=100){
+		for(var i=0; i<=10000; i+=100){
 			// замыкание: Обработка событий
 			(function(){
 				var eventName = 'witch.'+i;
@@ -33,5 +39,7 @@ return {init: function(){
 				});
 			})(); // конец замыкания
 		}
+		
+		firstScreen();
 	}}	
 })();
