@@ -16,7 +16,7 @@ return {init: function(){
 		if(!$('.witch').size()) {return true;}
 		$(window).scroll(listener);
 	
-		for(var i=0; i<=10000; i+=100){
+		for(var i=0; i<=100000; i+=100){
 			// замыкание: Обработка событий
 			(function(){
 				var eventName = 'witch.'+i;
