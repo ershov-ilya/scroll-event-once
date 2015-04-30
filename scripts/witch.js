@@ -1,45 +1,102 @@
 var WITCH = (function(){
+	var collection=[];
+	var range=[];
+	var needrefresh=false;
+
 	function listener(){
 		var position=$(window).scrollTop().valueOf();
 		var edge=Math.round(position/100)*100;
 		$(window).trigger('witch.'+edge);
+		needrefresh=true;
 	}
 	
 	function firstScreen(){
+		hunter();
 		setTimeout(function(){
 			$(window).trigger('witch.0');
 		}, 1500);
 	}
+	
+	function hunter(){
+		console.log('hunter:');
+		collection=[];
+		range=[];
+		
+		$('.witch').not('.fire').each(function(i){
+			//collection[i]={'fire':0};
+			//collection[i]['ptr']=this;
+			
+			var element= $(this);
+			var delay=element.data('witch-offset');
+			if(!delay) delay=0;
+			var elOffset=element.offset().top;
+			var elHeight=element.height();
+			if(elHeight>200) elHeight=200;
+			var offset=elOffset+elHeight+delay;
+			offset=Math.round(offset/100)*100;
+			
+			//collection[i]['offset']=offset;
+			if(!range[offset]) range[offset]=[];
+			range[offset].push(this);
+		});
+	}
+	
+	function tick(){
+		if(needrefresh){
+			hunter();
+			needrefresh=false;
+		}
+	}
 
 
 return {init: function(){
-		if(!$('.witch').size()) {return true;}
-		$(window).scroll(listener);
-	
-		for(var i=0; i<=100000; i+=100){
-			// замыкание: Обработка событий
-			(function(){
-				var eventName = 'witch.'+i;
-				//var className = '.witch-'+i;
-				$(window).on(eventName, function(){
-					var wh=$(window).height();
-					var ws=$(window).scrollTop().valueOf();
-					$('.witch').not('.fire').each(function(){
-						var element = $(this);
-						
-						var delay=element.data('witch-offset');
-						if(!delay) delay=0;
-						var elOffset=element.offset().top;
-						var elHeight=element.height();
-						var elLine=wh+ws;
-						var screenLine=elOffset+elHeight+delay;
-						if(screenLine < elLine){ element.addClass('fire'); }
-					});
-					$(window).off(eventName);
-				});
-			})(); // конец замыкания
-		}
-		
-		firstScreen();
-	}}	
+				if(!$('.witch').size()) {return true;}
+				$(window).scroll(listener);
+				
+				
+				
+				var eventName, wh, ws, element, delay, elOffset, elHeight, elLine, screenLine, i, j;
+			
+				for(i=0; i<=100000; i+=100){
+					// замыкание: Обработка событий
+					(function(){
+						eventName = 'witch.'+i;
+						//if(i<1000) console.log(eventName);
+						$(window).on(eventName, function(){
+							wh=$(window).height();
+							ws=$(window).scrollTop().valueOf();
+							elLine=wh+ws;
+							
+							for(j in range){
+								if(j<elLine) console.log('elLine: '+elLine);
+							}
+							$('.witch').not('.fire').each(function(){
+								element = $(this);
+								
+								delay=element.data('witch-offset');
+								if(!delay) delay=0;
+								elOffset=element.offset().top;
+								elHeight=element.height();
+								screenLine=elOffset+elHeight+delay;
+								if(screenLine < elLine){ element.addClass('fire'); }
+							});
+							$(window).off(eventName);
+						});
+					})(); // конец замыкания
+				}
+				
+				
+				
+				firstScreen();
+				setInterval(tick, 1000);
+				$(window).resize(function(){ needrefresh=true; });
+			},
+			get: function(){
+				for(var i in collection){
+					console.log(i+') '+collection[i]['offset']+' fire:'+collection[i]['fire']);
+				}
+				return collection.length;
+			},
+			show: function(){ console.log(range)}
+		}	
 })();
