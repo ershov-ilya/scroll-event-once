@@ -1,31 +1,22 @@
 var WITCH = (function(){
-	var collection=[];
 	var range=[];
-	var needrefresh=false;
+	var needMapper=true;
+	var needFire=true;
+	var handlerInterval;
 
 	function listener(){
-		var position=$(window).scrollTop().valueOf();
-		var edge=Math.round(position/100)*100;
-		$(window).trigger('witch.'+edge);
-		needrefresh=true;
-	}
-	
-	function firstScreen(){
-		mapper();
-		setTimeout(function(){
-			$(window).trigger('witch.0');
-		}, 1500);
+		needFire=true;
 	}
 	
 	function mapper(){
-		console.log('mapper:');
-		collection=[];
+		console.log('mapper');
 		range=[];
+
+		var $selector = $('.witch').not('.fire');
+
+		if(!$selector.size()) clearInterval(handlerInterval);
 		
-		$('.witch').not('.fire').each(function(i){
-			//collection[i]={'fire':0};
-			//collection[i]['ptr']=this;
-			
+		$selector.each(function(i){
 			var element= $(this);
 			var delay=element.data('witch-offset');
 			if(!delay) delay=0;
@@ -41,66 +32,53 @@ var WITCH = (function(){
 		});
 	}
 	
-	function tick(){
-		if(needrefresh){
-			mapper();
-			needrefresh=false;
+	function fireAt(front){
+		console.log('fire at: '+front);
+
+		var arr=range[front];
+		for(var k in arr){
+			$(arr[k]).addClass('fire');
 		}
+		delete(range[front]); 
+	}
+
+	function tick(){
+		console.log('tick');
+		if(needMapper){
+			mapper();
+			needMapper=false;
+		}
+		if(needFire){
+			console.log('fire');
+			var wh, ws, element, delay, elOffset, elHeight, fireFront, fireFrontLine, screenLine, i, j;
+			wh=$(window).height();
+			ws=$(window).scrollTop().valueOf();
+			fireFront=wh+ws;
+
+			fireFrontLine=Math.round(fireFront/100)*100;
+			
+			for(j in range){
+				if(j>=ws && j<=fireFrontLine) {
+					fireAt(j);
+				}
+			}
+
+			needFire=false;
+		}
+		return true;		
 	}
 
 
-return {init: function(){
-				if(!$('.witch').size()) {return true;}
-				$(window).scroll(listener);
-				
-				
-				
-				var eventName, wh, ws, element, delay, elOffset, elHeight, fireFront, fireFrontLine, screenLine, i, j;
-			
-				for(i=0; i<=100000; i+=100){
-					// замыкание: Обработка событий
-					(function(){
-						eventName = 'witch.'+i;
-						//if(i<1000) console.log(eventName);
-						$(window).on(eventName, function(){
-							wh=$(window).height();
-							ws=$(window).scrollTop().valueOf();
-							fireFront=wh+ws;
+return {
+	init: function(){
+			if(!$('.witch').size()) {return true;}
+			$(window).scroll(listener);
 
-							fireFrontLine=Math.round(fireFront/100)*100;
-							
-							for(j in range){
-								if(j>=ws && j<=fireFrontLine) {
-									console.log('fire at: '+j);
-								}
-							}
-							$('.witch').not('.fire').each(function(){
-								element = $(this);
-								
-								delay=element.data('witch-offset');
-								if(!delay) delay=0;
-								elOffset=element.offset().top;
-								elHeight=element.height();
-								screenLine=elOffset+elHeight+delay;
-								if(screenLine < fireFront){ element.addClass('fire'); }
-							});
-							$(window).off(eventName);
-						});
-					})(); // конец замыкания
-				}
-				
-				
-				
-				firstScreen();
-				setInterval(tick, 1000);
-				$(window).resize(function(){ needrefresh=true; });
-			},
-			get: function(){
-				for(var i in collection){
-					console.log(i+') '+collection[i]['offset']+' fire:'+collection[i]['fire']);
-				}
-				return collection.length;
-			},
-			show: function(){ console.log(range)}
-		}	
-})();
+			handlerInterval = setInterval(tick, 500);
+			setInterval(function(){needMapper=true;}, 3000);
+			
+			$(window).resize(function(){ needMapper=true; });
+		}
+	}	
+}
+)();
