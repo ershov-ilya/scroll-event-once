@@ -11,14 +11,14 @@ var WITCH = (function(){
 	}
 	
 	function firstScreen(){
-		hunter();
+		mapper();
 		setTimeout(function(){
 			$(window).trigger('witch.0');
 		}, 1500);
 	}
 	
-	function hunter(){
-		console.log('hunter:');
+	function mapper(){
+		console.log('mapper:');
 		collection=[];
 		range=[];
 		
@@ -43,7 +43,7 @@ var WITCH = (function(){
 	
 	function tick(){
 		if(needrefresh){
-			hunter();
+			mapper();
 			needrefresh=false;
 		}
 	}
@@ -55,7 +55,7 @@ return {init: function(){
 				
 				
 				
-				var eventName, wh, ws, element, delay, elOffset, elHeight, elLine, screenLine, i, j;
+				var eventName, wh, ws, element, delay, elOffset, elHeight, fireFront, fireFrontLine, screenLine, i, j;
 			
 				for(i=0; i<=100000; i+=100){
 					// замыкание: Обработка событий
@@ -65,10 +65,14 @@ return {init: function(){
 						$(window).on(eventName, function(){
 							wh=$(window).height();
 							ws=$(window).scrollTop().valueOf();
-							elLine=wh+ws;
+							fireFront=wh+ws;
+
+							fireFrontLine=Math.round(fireFront/100)*100;
 							
 							for(j in range){
-								if(j<elLine) console.log('elLine: '+elLine);
+								if(j>=ws && j<=fireFrontLine) {
+									console.log('fire at: '+j);
+								}
 							}
 							$('.witch').not('.fire').each(function(){
 								element = $(this);
@@ -78,7 +82,7 @@ return {init: function(){
 								elOffset=element.offset().top;
 								elHeight=element.height();
 								screenLine=elOffset+elHeight+delay;
-								if(screenLine < elLine){ element.addClass('fire'); }
+								if(screenLine < fireFront){ element.addClass('fire'); }
 							});
 							$(window).off(eventName);
 						});
