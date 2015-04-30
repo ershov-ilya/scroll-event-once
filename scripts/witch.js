@@ -1,15 +1,16 @@
 var WITCH = (function(){
+	var DEBUG=false;
 	var range=[];
-	var needMapper=true;
-	var needFire=true;
 	var handlerInterval;
+	var needMapper=false;
+	var needFire=false;
 
 	function listener(){
 		needFire=true;
 	}
 	
 	function mapper(){
-		console.log('mapper');
+		if(DEBUG) console.log('mapper');
 		range=[];
 
 		var $selector = $('.witch').not('.fire');
@@ -33,7 +34,7 @@ var WITCH = (function(){
 	}
 	
 	function fireAt(front){
-		console.log('fire at: '+front);
+		if(DEBUG) console.log('fire at: '+front);
 
 		var arr=range[front];
 		for(var k in arr){
@@ -43,13 +44,13 @@ var WITCH = (function(){
 	}
 
 	function tick(){
-		console.log('tick');
+		if(DEBUG) console.log('tick');
 		if(needMapper){
 			mapper();
 			needMapper=false;
 		}
 		if(needFire){
-			console.log('fire');
+			if(DEBUG) console.log('fire');
 			var wh, ws, element, delay, elOffset, elHeight, fireFront, fireFrontLine, screenLine, i, j;
 			wh=$(window).height();
 			ws=$(window).scrollTop().valueOf();
@@ -75,7 +76,8 @@ return {
 			$(window).scroll(listener);
 
 			handlerInterval = setInterval(tick, 500);
-			setInterval(function(){needMapper=true;}, 3000);
+			setInterval(function(){needMapper=true;}, 5000);
+			setTimeout(function(){ needMapper=false; needFire=false; },2000);
 			
 			$(window).resize(function(){ needMapper=true; });
 		}
